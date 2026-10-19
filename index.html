@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kuis Kecerdasan Buatan - Pertemuan ke-5: Pemrosesan Bahasa Alami (NLP)</title>
+<style>
+:root{--navy:#14305f;--navy2:#1f4a8a;--ink:#1c2433;--mut:#5b6678;--line:#d5dbe6;--bg:#f2f5fa;--card:#fff;--ok:#1d7a46;--okbg:#e6f4ec;--bad:#b3261e;--badbg:#fbeaea;--acc:#e8731a}
+@media(prefers-color-scheme:dark){:root:not(.print){--ink:#e8ecf4;--mut:#a3adc0;--line:#34415a;--bg:#0f1624;--card:#18223a;--okbg:#14301f;--badbg:#3a1a1a;--navy2:#7fa8e8}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+header{background:var(--navy);color:#fff;padding:18px 20px}
+header .in{max-width:860px;margin:auto;display:flex;gap:14px;align-items:center}
+.logo{width:46px;height:46px;border-radius:10px;background:#fff;color:var(--navy);font-weight:800;display:grid;place-items:center;font-size:13px;border-bottom:4px solid var(--acc);flex:none}
+header h1{font-size:18px;margin:0;line-height:1.3}
+header p{margin:2px 0 0;font-size:13px;opacity:.85}
+main{max-width:860px;margin:auto;padding:20px 16px 48px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px}
+.hide{display:none!important}
+label{display:block;font-weight:600;font-size:14px;margin:14px 0 5px}
+input,select{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:8px;font:inherit;background:var(--card);color:var(--ink)}
+input:focus,select:focus,button:focus-visible{outline:3px solid #7fa8e8;outline-offset:1px}
+.btn{background:var(--navy);color:#fff;border:0;border-radius:8px;padding:11px 20px;font:inherit;font-weight:600;cursor:pointer}
+.btn:hover{background:var(--navy2)}
+.btn.sec{background:transparent;color:var(--navy2);border:1.5px solid var(--navy2)}
+.btn:disabled{opacity:.4;cursor:default}
+.info{background:#fff6e8;color:#6a4310;border-left:4px solid var(--acc);padding:10px 14px;border-radius:6px;font-size:14px;margin:0 0 6px}
+.err{color:var(--bad);font-size:14px;margin-top:10px;min-height:20px}
+.meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:14px;color:var(--mut);margin-bottom:10px}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;background:var(--navy2);transition:width .25s}
+.qtext{font-size:18px;font-weight:600;margin:0 0 16px}
+.opt{display:flex;gap:12px;width:100%;text-align:left;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:9px;font:inherit;cursor:pointer}
+.opt:hover{border-color:var(--navy2)}
+.opt b{flex:none;width:26px;height:26px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-size:13px}
+.opt.sel{border-color:var(--navy2);background:#e8f0fc;color:#14305f}
+.opt.sel b{background:var(--navy);color:#fff}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:6px;margin-top:18px}
+.grid button{padding:7px 0;border:1.5px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
+.grid .done{background:var(--navy);color:#fff;border-color:var(--navy)}
+.grid .now{outline:3px solid var(--acc)}
+.sum{display:flex;gap:22px;flex-wrap:wrap;align-items:center}
+.score{width:130px;height:130px;border-radius:50%;border:8px solid var(--navy2);display:grid;place-items:center;text-align:center;flex:none}
+.score strong{font-size:38px;line-height:1}.score span{font-size:12px;color:var(--mut)}
+table.id{border-collapse:collapse;font-size:15px}
+table.id td{padding:2px 12px 2px 0;vertical-align:top}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.stats span{padding:4px 12px;border-radius:20px;font-size:14px;font-weight:600}
+.s1{background:var(--okbg);color:var(--ok)}.s2{background:var(--badbg);color:var(--bad)}.s3{background:var(--bg);color:var(--mut)}
+.rv{margin-top:14px;border:1px solid var(--line);border-left:6px solid var(--line);border-radius:10px;padding:16px;background:var(--card);break-inside:avoid;page-break-inside:avoid}
+.rv.ok{border-left-color:var(--ok)}.rv.no{border-left-color:var(--bad)}
+.rv h3{font-size:15.5px;margin:0 0 10px}
+.ro{padding:6px 10px;border-radius:6px;margin:4px 0;font-size:14.5px}
+.ro.c{background:var(--okbg);color:var(--ok);font-weight:600}.ro.w{background:var(--badbg);color:var(--bad);font-weight:600}
+.pb{margin-top:10px;font-size:14.5px;background:var(--bg);padding:10px 12px;border-radius:6px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.pheader{display:none}
+@media print{
+ :root{--ink:#000;--mut:#444;--line:#bbb;--bg:#fff;--card:#fff;--okbg:#e6f4ec;--badbg:#fbeaea}
+ header,.noprint,.row{display:none!important}
+ body{background:#fff;font-size:12.5px}
+ main{padding:0;max-width:none}
+ .card{border:0;padding:0}
+ .pheader{display:block;border-bottom:3px solid #14305f;margin-bottom:10px;padding-bottom:6px}
+ .pheader h2{margin:0;font-size:16px;color:#14305f}.pheader p{margin:0;font-size:12px}
+ *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<header><div class="in"><div class="logo">UBSI</div><div><h1>Kuis Kecerdasan Buatan — Pertemuan ke-5</h1><p>Pemrosesan Bahasa Alami (Natural Language Processing)</p></div></div></header>
+<main>
+
+<section id="s-login" class="card">
+ <p class="info">30 soal pilihan ganda. Kuis hanya dapat dikerjakan satu kali per NIM. Pembahasan tampil setelah kuis selesai.</p>
+ <form id="f" autocomplete="off" onsubmit="return false">
+  <label for="nama">Nama lengkap</label><input id="nama" required placeholder="Contoh: Budi Santoso">
+  <label for="nim">NIM</label><input id="nim" required inputmode="numeric" placeholder="Contoh: 19240001">
+  <label for="prodi">Program studi</label>
+  <input id="prodi" list="pl" required placeholder="Pilih atau ketik program studi">
+  <datalist id="pl"><option value="Teknologi Komputer"><option value="Teknik Informatika"><option value="Sistem Informasi"><option value="Sistem Informasi Akuntansi"><option value="Teknik Industri"><option value="Ilmu Komputer"><option value="Manajemen Informatika"><option value="Teknik Komputer"></datalist>
+  <div class="err" id="lerr" role="alert"></div>
+  <button class="btn" id="go" type="button">Mulai kuis</button>
+ </form>
+</section>
+
+<section id="s-quiz" class="card hide">
+ <div class="meta"><span id="who"></span><span id="cnt"></span></div>
+ <div class="bar"><i id="pg"></i></div>
+ <p class="qtext" id="qt"></p>
+ <div id="opts"></div>
+ <div class="nav"><button class="btn sec" id="prev">Sebelumnya</button><button class="btn" id="next">Berikutnya</button></div>
+ <div class="grid" id="grid"></div>
+</section>
+
+<section id="s-res" class="hide">
+ <div class="card">
+  <div class="pheader"><h2>Universitas Bina Sarana Informatika — Hasil Kuis Kecerdasan Buatan</h2><p>Pertemuan ke-5: Pemrosesan Bahasa Alami (NLP)</p></div>
+  <div class="sum">
+   <div class="score"><div><strong id="sc"></strong><span>dari 100</span></div></div>
+   <div><table class="id" id="idt"></table><div class="stats" id="st"></div></div>
+  </div>
+  <div class="row"><button class="btn" id="pdf">Simpan sebagai PDF</button></div>
+ </div>
+ <h2 style="margin:24px 0 0;font-size:18px">Pembahasan</h2>
+ <div id="rv"></div>
+ <div class="row"><button class="btn" onclick="window.print()">Simpan sebagai PDF</button></div>
+</section>
+</main>
+
+<script>
+var Q=[
+{q:"Mesin NLP mengubah kalimat \"Saya mau tiket ke Bali besok!\" menjadi [Intent: Beli], [Objek: Tiket], [Lokasi: Bali], [Waktu: Besok]. Proses ini menunjukkan bahwa NLP berfokus pada …",o:["Ekstraksi makna dan informasi di balik bahasa","Penyimpanan kalimat dalam format teks","Penghitungan jumlah huruf dalam kalimat","Penerjemahan kalimat ke bahasa daerah"],a:0,e:"NLP bukan sekadar memasukkan bahasa ke program, melainkan mengartikan bahasa dan mengambil informasi di baliknya, seperti intent, objek, lokasi, dan waktu."},
+{q:"Apa perbedaan utama pemrosesan bahasa lisan dibandingkan naskah tertulis?",o:["Bahasa lisan tidak memerlukan pengetahuan sintaks dan semantik","Bahasa lisan memerlukan pemrosesan gelombang suara (fonologi) terlebih dahulu","Bahasa lisan hanya memakai pengetahuan leksikal","Bahasa lisan lebih sederhana karena tidak memiliki struktur kalimat"],a:1,e:"Bahasa lisan memakai semua elemen naskah tertulis (leksikal, sintaks, semantik) ditambah kebutuhan memproses gelombang suara (fonologi) lebih dulu, sehingga jauh lebih kompleks."},
+{q:"Analisis leksikal dalam NLP berfokus pada …",o:["Struktur dan hubungan antarkata","Makna kata dan kalimat","Niat sebenarnya dari pengguna","Kata dan bentuk kata (tokenisasi, lemma, kelas kata)"],a:3,e:"Analisis leksikal menganalisis kata sebagai unit bahasa: tokenisasi, identifikasi kata, morfologi, lemmatisasi, dan kelas kata (POS). Struktur antarkata adalah sintaks, makna adalah semantik."},
+{q:"Kalimat \"Kucing mengejar tikus.\" dan \"Tikus mengejar kucing.\" sama-sama gramatikal tetapi bermakna berbeda. Hal ini menunjukkan bahwa …",o:["Analisis leksikal saja cukup untuk menentukan makna","Kedua kalimat memiliki pelaku yang sama","Urutan kata menentukan peran semantik (pelaku dan sasaran)","Kalimat kedua pasti salah secara sintaks"],a:2,e:"Pada kalimat pertama kucing adalah pelaku dan tikus sasaran; pada kalimat kedua perannya terbalik. Maka struktur sintaks yang benar belum cukup, peran semantik harus dianalisis."},
+{q:"Pada kalimat \"Mahasiswa membaca buku.\", peran semantik kata \"buku\" adalah …",o:["Sasaran (Patient/Theme)","Pelaku (Agent)","Tindakan (Action)","Predikat (P)"],a:0,e:"Mahasiswa = pelaku (Agent), membaca = tindakan (Action), buku = sasaran (Patient/Theme). \"Predikat\" adalah istilah peran sintaks, bukan peran semantik."},
+{q:"Kalimat \"Mengejar kucing tikus.\" dinilai sebagai …",o:["Gramatikal sepenuhnya dan maknanya jelas","Gramatikal dan pelakunya pasti tikus","Kalimat sempurna karena terdiri atas tiga kata","Tidak lazim secara tata bahasa dan maknanya tidak jelas atau bergantung konteks"],a:3,e:"Susunan kata tidak lazim sehingga siapa mengejar siapa tidak jelas dan bergantung pada konteks."},
+{q:"Kalimat \"Saya melihat mahasiswa dengan teleskop.\" dapat berarti saya memakai teleskop atau mahasiswa membawa teleskop. Ini merupakan contoh …",o:["Ambiguitas leksikal","Ambiguitas struktural","Evolusi kosakata","Informasi tidak utuh"],a:1,e:"Satu kalimat dengan dua kemungkinan struktur frasa menghasilkan dua tafsiran: ambiguitas struktural. Ambiguitas leksikal berasal dari kata bermakna ganda, seperti \"bank\"."},
+{q:"Mengapa tidak ada program NLP yang benar-benar \"sempurna\" menurut tantangan evolusi kosakata?",o:["Komputer tidak dapat membaca huruf","Tata bahasa manusia tidak pernah berubah","Bahasa terus berkembang dan kosakata baru muncul setiap hari","Kalimat selalu terpotong saat dibaca mesin"],a:2,e:"Kata baru seperti selfie, work from home, dan prompt terus bermunculan, sehingga aturan dan kamus yang tetap akan selalu tertinggal."},
+{q:"Urutan 5 tahap ekstraksi makna pada pipeline klasik NLP adalah …",o:["Morfologi → Sintaks → Semantik → Penyatuan konteks → Pragmatis","Sintaks → Morfologi → Semantik → Pragmatis → Penyatuan konteks","Morfologi → Semantik → Sintaks → Pragmatis → Penyatuan konteks","Pragmatis → Penyatuan konteks → Semantik → Sintaks → Morfologi"],a:0,e:"Teks dipecah dan dianalisis (morfologi), disusun menjadi struktur (sintaks), diberi arti dasar (semantik), disesuaikan dengan konteks, lalu diinterpretasikan maksudnya (pragmatis)."},
+{q:"Pada kalimat \"Dia membaca buku.\", kata \"dia\" dipahami sebagai \"mahasiswa\" berdasarkan kalimat sebelumnya. Tahap pipeline yang menangani hal ini adalah …",o:["Analisis morfologi","Penyatuan arah (konteks)","Analisis sintaks","Text-to-Speech"],a:1,e:"Penyatuan konteks menyesuaikan makna berdasarkan kalimat sebelum dan sesudahnya, termasuk menangani anafora, elipsis, dan referensi."},
+{q:"Pada analisis pragmatis, kalimat \"Bisakah kamu membaca buku ini?\" umumnya ditafsirkan sebagai …",o:["Pertanyaan tentang kemampuan membaca","Pernyataan fakta","Permintaan atau instruksi untuk membaca","Kalimat yang tidak gramatikal"],a:2,e:"Analisis pragmatis mencari maksud sebenarnya berdasarkan situasi dan tujuan. Kalimat tersebut adalah permohonan, bukan pertanyaan tentang kemampuan."},
+{q:"Fungsi parser dalam pemrosesan bahasa adalah …",o:["Menguji secara kaku apakah kalimat masukan valid menurut grammar atau harus ditolak","Mengubah suara menjadi teks","Menghitung frekuensi kemunculan kata","Membuat representasi vektor kata"],a:0,e:"Grammar adalah aturan baku pembentuk kalimat, sedangkan parser adalah mesin pemeriksa yang menguji kalimat terhadap aturan tersebut."},
+{q:"Top-down parsing dimulai dari …",o:["Kata-kata terminal lalu menggabungkannya (reduce)","Simbol Start (S) lalu menerapkan aturan grammar secara berturut-turut (expand)","Label kelas kata setiap token","Vektor embedding setiap kata"],a:1,e:"Top-down memulai dari S, mengembangkannya menjadi frasa (S → NP VP), lalu terus hingga mencapai kata-kata terminal. Contoh algoritmanya adalah recursive descent."},
+{q:"Pernyataan yang benar tentang bottom-up parsing adalah …",o:["Contoh algoritmanya recursive descent","Strateginya expand, yaitu menerapkan aturan","Prosesnya dimulai dari simbol Start (S)","Dimulai dari kata terminal, strateginya reduce, contoh algoritmanya shift-reduce dan CYK"],a:3,e:"Bottom-up menggabungkan kata menjadi frasa (Det + N → NP) hingga tercapai S, memakai strategi reduce. Opsi lain adalah ciri top-down."},
+{q:"Dalam context-free grammar, label PP (misalnya \"di perpustakaan\") merupakan singkatan dari …",o:["Frasa verba","Frasa nomina","Frasa preposisional","Kata penghubung"],a:2,e:"PP = Prepositional Phrase, dibentuk dengan aturan PP → P NP. Frasa verba adalah VP, frasa nomina adalah NP."},
+{q:"Pada word embeddings, kata-kata yang bermakna mirip akan …",o:["Berada berdekatan dalam ruang vektor","Memiliki huruf awal yang sama","Selalu memiliki vektor yang identik","Berada berjauhan dalam ruang vektor"],a:0,e:"Kata direpresentasikan sebagai vektor numerik dan kata bermakna mirip (misalnya kucing dan anjing) berada dekat, sehingga mesin dapat menghitung kemiripan semantik."},
+{q:"Dalam analogi vektor kata, hasil operasi raja − pria + wanita kira-kira sama dengan …",o:["Kucing","Ratu","Anjing","Pangeran"],a:1,e:"Mengurangi \"pria\" dan menambah \"wanita\" menggeser vektor raja ke arah ratu. Ini menunjukkan embedding menangkap hubungan semantik dan analogi."},
+{q:"Perbedaan CBOW dan Skip-gram pada Word2Vec yang benar adalah …",o:["CBOW memprediksi kata konteks dari kata target, Skip-gram sebaliknya","Keduanya memprediksi kata target dari konteks","CBOW lebih baik untuk kata-kata jarang","CBOW memprediksi kata target dari konteks, sedangkan Skip-gram memprediksi kata sekitar dari kata target dan lebih baik untuk kata jarang"],a:3,e:"CBOW memakai konteks untuk menebak kata tengah (cepat, baik untuk dataset besar). Skip-gram menebak kata sekitar dari kata target dan lebih baik untuk rare words."},
+{q:"Berbeda dengan Word2Vec, embedding pada model Transformer seperti BERT dan GPT bersifat …",o:["Statis, satu vektor untuk satu kata","Hanya bergantung pada jendela kata lokal","Kontekstual, berubah sesuai kalimat","Tidak menggunakan vektor"],a:2,e:"Pada Transformer, kata \"bank\" memiliki vektor berbeda untuk konteks keuangan dan konteks tempat duduk. Word2Vec memberi satu vektor tetap per kata."},
+{q:"Mekanisme self-attention pada Transformer memungkinkan …",o:["Setiap token menghitung bobot perhatian terhadap semua token lain dalam kalimat","Pembacaan kata satu per satu secara berurutan","Model hanya melihat kata-kata sebelumnya","Penghapusan kata yang dianggap tidak penting"],a:0,e:"Transformer membaca seluruh kalimat secara bersamaan sehingga hubungan jarak jauh, misalnya \"dia\" dengan \"Kucing\", tetap terjaga."},
+{q:"BERT cocok untuk tugas pemahaman bahasa (klasifikasi, NER, tanya jawab) karena …",o:["Hanya melihat token sebelumnya","Membaca konteks dua arah (kiri dan kanan) sekaligus","Dilatih memprediksi token berikutnya secara autoregressive","Tidak menggunakan arsitektur Transformer"],a:1,e:"BERT adalah encoder bidirectional yang menghasilkan representasi kontekstual dengan memanfaatkan konteks di kedua sisi token."},
+{q:"GPT menghasilkan teks dengan cara …",o:["Melihat token setelahnya untuk memastikan konteks","Membaca dua arah sekaligus seperti BERT","Mencari kalimat jadi dalam kamus","Memprediksi token berikutnya hanya dari token sebelumnya (decoder, autoregressive)"],a:3,e:"GPT adalah decoder yang membaca dari kiri ke kanan. Setiap token hanya melihat token sebelumnya, cocok untuk generasi teks, dialog, dan kode."},
+{q:"Fungsi positional encoding pada Transformer adalah …",o:["Mengubah token menjadi huruf","Menghapus token yang berulang","Memberi tahu model posisi setiap token dalam kalimat","Menghitung probabilitas kata berikutnya"],a:2,e:"Karena self-attention memproses semua token sekaligus, informasi urutan ditambahkan ke embedding melalui positional encoding."},
+{q:"Pada alur Speech NLP, tahap yang mengubah ucapan menjadi teks menggunakan model seperti Whisper atau wav2vec 2.0 adalah …",o:["Speech Recognition (ASR)","Text-to-Speech","Preprocessing audio","Dialog management"],a:0,e:"ASR (Automatic Speech Recognition) mengubah fitur audio menjadi teks. Teks hasil transkripsi kemudian dipahami oleh NLP (intent, entitas, dialog)."},
+{q:"Hubungan yang tepat antara NLP dan LLM adalah …",o:["LLM mencakup seluruh bidang NLP","NLP baru ada setelah LLM ditemukan","NLP sama dengan Deep Learning","LLM adalah salah satu jenis model yang digunakan dalam NLP, bukan keseluruhan NLP"],a:3,e:"NLP adalah bidang yang berfokus pada bahasa manusia dan sudah berkembang sebelum machine learning modern. LLM adalah satu jenis model di dalamnya, umumnya berbasis Transformer."},
+{q:"Kekurangan pendekatan rule-based (aturan linguistik) dalam NLP adalah …",o:["Hasilnya tidak transparan","Sulit menangani variasi bahasa yang kompleks atau informal dan membutuhkan tenaga ahli linguistik","Membutuhkan data latih dalam jumlah sangat besar","Membutuhkan GPU berkapasitas besar"],a:1,e:"Rule-based mudah dipahami, transparan, dan tidak butuh banyak data latih, tetapi kurang fleksibel terhadap bahasa informal, konteks baru, dan skala besar."},
+{q:"Dari korpus \"Saya suka AI. Saya suka data.\", nilai bigram P(suka | saya) adalah …",o:["0,5","0","1,0","2,0"],a:2,e:"Count(saya, suka) = 2 dan Count(saya) = 2, sehingga P = 2/2 = 1,0. Sebagai pembanding, P(ai | suka) = 1/2 = 0,5."},
+{q:"Pendekatan NLP yang memakai fitur buatan seperti Bag of Words atau TF-IDF dengan algoritma seperti Naive Bayes dan SVM disebut …",o:["Machine learning tradisional","Deep learning berbasis Transformer","Rule-based","Large Language Model"],a:0,e:"Machine learning tradisional membutuhkan representasi fitur numerik buatan dan tidak memakai neural network berlapis. Kelebihannya sederhana, cepat, dan mudah diinterpretasikan."},
+{q:"Berikut ini yang merupakan kekurangan pendekatan deep learning (Transformer dan LLM) dalam NLP adalah …",o:["Tidak mampu memahami konteks secara mendalam","Tidak dapat dipakai untuk banyak tugas NLP sekaligus","Membutuhkan data besar dan komputasi tinggi, serta berpotensi menghasilkan informasi tidak akurat (halusinasi)","Hanya dapat memproses satu kata pada satu waktu"],a:2,e:"Transformer dan LLM memahami konteks secara mendalam dan mendukung banyak tugas (multitask), tetapi pelatihannya mahal, kurang transparan, rentan bias, dan dapat berhalusinasi."},
+{q:"Urutan proses pelatihan LLM secara sederhana adalah …",o:["Fine-tuning → pretraining → korpus teks → LLM siap digunakan","Korpus teks → fine-tuning → pretraining → LLM siap digunakan","Pretraining → korpus teks → alignment → LLM siap digunakan","Korpus teks sangat besar → pretraining → fine-tuning/alignment → LLM siap digunakan"],a:3,e:"LLM dilatih dari korpus sangat besar untuk memprediksi token berikutnya (pretraining), lalu disesuaikan lewat supervised fine-tuning, instruction tuning, dan RLHF sebelum dipakai."}
+];
+</script>
+<script>
+(function(){
+var L=["A","B","C","D"],N=Q.length,KEY="kuis-kb-p5-nlp-",$=function(i){return document.getElementById(i)};
+var U=null,ans=[],cur=0;
+function get(k){try{var v=localStorage.getItem(KEY+k);return v?JSON.parse(v):null}catch(e){return null}}
+function set(k,v){try{localStorage.setItem(KEY+k,JSON.stringify(v))}catch(e){}}
+function show(id){["s-login","s-quiz","s-res"].forEach(function(s){$(s).classList.toggle("hide",s!==id)});window.scrollTo(0,0)}
+function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
+
+$("go").onclick=function(){
+ var n=$("nama").value.trim(),m=$("nim").value.trim(),p=$("prodi").value.trim();
+ if(!n||!m||!p){$("lerr").textContent="Nama, NIM, dan program studi wajib diisi.";return}
+ if(!/^[0-9A-Za-z.\-]{5,}$/.test(m)){$("lerr").textContent="NIM tidak valid. Periksa kembali.";return}
+ U={nama:n,nim:m,prodi:p};
+ var done=get("res-"+m);
+ if(done){U=done.user;ans=done.ans;showRes(done);return}
+ var pr=get("prog-"+m);
+ if(pr&&pr.ans&&pr.ans.length===N){ans=pr.ans;cur=pr.cur||0}else{ans=[];for(var i=0;i<N;i++)ans.push(-1);cur=0}
+ $("lerr").textContent="";show("s-quiz");draw();
+};
+function draw(){
+ var q=Q[cur],a=ans.filter(function(x){return x>=0}).length;
+ $("who").textContent=U.nama+" · "+U.nim;
+ $("cnt").textContent="Soal "+(cur+1)+" dari "+N+" · terjawab "+a;
+ $("pg").style.width=(a/N*100)+"%";
+ $("qt").textContent=(cur+1)+". "+q.q;
+ var h="";q.o.forEach(function(t,i){h+='<button class="opt'+(ans[cur]===i?" sel":"")+'" data-i="'+i+'"><b>'+L[i]+'</b><span>'+esc(t)+'</span></button>'});
+ $("opts").innerHTML=h;
+ Array.prototype.forEach.call($("opts").children,function(b){b.onclick=function(){ans[cur]=+b.dataset.i;set("prog-"+U.nim,{ans:ans,cur:cur});draw()}});
+ $("prev").disabled=cur===0;
+ $("next").textContent=cur===N-1?"Selesaikan kuis":"Berikutnya";
+ var g="";for(var i=0;i<N;i++)g+='<button data-n="'+i+'" class="'+(ans[i]>=0?"done ":"")+(i===cur?"now":"")+'" aria-label="Soal '+(i+1)+'">'+(i+1)+'</button>';
+ $("grid").innerHTML=g;
+ Array.prototype.forEach.call($("grid").children,function(b){b.onclick=function(){cur=+b.dataset.n;set("prog-"+U.nim,{ans:ans,cur:cur});draw()}});
+}
+$("prev").onclick=function(){if(cur>0){cur--;draw()}};
+$("next").onclick=function(){
+ if(cur<N-1){cur++;set("prog-"+U.nim,{ans:ans,cur:cur});draw();return}
+ var un=ans.filter(function(x){return x<0}).length;
+ var msg=un?"Masih ada "+un+" soal belum dijawab. Selesaikan kuis sekarang? Kuis tidak dapat diulang.":"Selesaikan kuis sekarang? Kuis tidak dapat diulang.";
+ if(!confirm(msg))return;
+ finish();
+};
+function finish(){
+ var c=0;ans.forEach(function(x,i){if(x===Q[i].a)c++});
+ var d=new Date().toLocaleString("id-ID",{dateStyle:"long",timeStyle:"short"});
+ var r={user:U,ans:ans,correct:c,score:Math.round(c/N*1000)/10,date:d};
+ set("res-"+U.nim,r);try{localStorage.removeItem(KEY+"prog-"+U.nim)}catch(e){}
+ showRes(r);
+}
+function showRes(r){
+ var un=r.ans.filter(function(x){return x<0}).length,wr=N-r.correct-un;
+ var sc=r.score%1?r.score.toFixed(1).replace(".",","):String(r.score);
+ $("sc").textContent=sc;
+ $("idt").innerHTML="<tr><td>Nama</td><td>: "+esc(r.user.nama)+"</td></tr><tr><td>NIM</td><td>: "+esc(r.user.nim)+"</td></tr><tr><td>Program studi</td><td>: "+esc(r.user.prodi)+"</td></tr><tr><td>Waktu</td><td>: "+esc(r.date)+"</td></tr><tr><td>Keterangan</td><td>: "+(r.score>=70?"Tuntas (nilai ≥ 70)":"Belum tuntas (nilai < 70)")+"</td></tr>";
+ $("st").innerHTML='<span class="s1">Benar '+r.correct+'</span><span class="s2">Salah '+wr+'</span><span class="s3">Kosong '+un+'</span>';
+ var h="";
+ Q.forEach(function(q,i){
+  var a=r.ans[i],ok=a===q.a;
+  h+='<div class="rv '+(ok?"ok":"no")+'"><h3>'+(i+1)+". "+esc(q.q)+"</h3>";
+  q.o.forEach(function(t,j){
+   var cl="ro",tag="";
+   if(j===q.a){cl+=" c";tag=a===j?" ✔ Jawaban Anda (benar)":" ✔ Kunci jawaban"}
+   else if(j===a){cl+=" w";tag=" ✘ Jawaban Anda"}
+   h+='<div class="'+cl+'">'+L[j]+". "+esc(t)+tag+"</div>";
+  });
+  if(a<0)h+='<div class="ro w">Tidak dijawab</div>';
+  h+='<div class="pb"><b>Pembahasan:</b> '+esc(q.e)+"</div></div>";
+ });
+ $("rv").innerHTML=h;
+ document.title="Hasil_Kuis_NLP_"+r.user.nim+"_"+r.user.nama.replace(/\s+/g,"_");
+ show("s-res");
+}
+$("pdf").onclick=function(){window.print()};
+window.addEventListener("beforeunload",function(e){if(!$("s-quiz").classList.contains("hide")){e.preventDefault();e.returnValue=""}});
+})();
+</script>
+</body>
+</html>
